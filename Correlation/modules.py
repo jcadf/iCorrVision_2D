@@ -38,6 +38,7 @@ V = 'v1.04.22' # Version
 # Modules
 ########################################################################################################################
 import tkinter as tk; from tkinter import *
+from tkinter import ttk
 import os
 from math import pi
 import subprocess
@@ -61,6 +62,15 @@ matplotlib.use('Agg', force=True)
 ########################################################################################################################
 def openguide(CurrentDir):
     subprocess.Popen([CurrentDir + '\static\iCorrVision-2D.pdf'], shell=True)
+
+########################################################################################################################
+# Configure combobox
+########################################################################################################################
+def combo_configure(event):
+    width = 40
+    style = ttk.Style()
+    style.configure(style='TCombobox', postoffset=(0, 0, width, 0))
+
 
 ########################################################################################################################
 # Global variables declaration for parallel computing (x0, y0, u0, v0, x1, y1, u1 and v1)
@@ -369,6 +379,7 @@ def load(menu, captured_status, console, canvas, file_var, V, file, capturedFold
     global test_captured, fileNames, Format, Images
 
     file_load = filedialog.askopenfilename()
+    print(file_load)
 
     if file_load != '':
 
@@ -401,15 +412,17 @@ def load(menu, captured_status, console, canvas, file_var, V, file, capturedFold
         Adjust.set(lines[w]); w = w + 2
         Alpha.set(lines[w])
 
-        captured_status.configure(bg = '#00cd00') # Green indicator
+        CapturedImagesFolderName = capturedFolder.get().rsplit('/', 1)[1]
+        capturedFolder.set(file_load.rsplit('/', 1)[0]+'/'+CapturedImagesFolderName)
+        fileNames = sorted(glob.glob(capturedFolder.get()+'/*'),key=stringToList)
+        Format = '.'+fileNames[0].rsplit('.', 1)[1]
+        Images = len(fileNames)
+
+        captured_status.configure(bg='#00cd00')  # Green indicator
         console.insert(tk.END,
                        '###########################################################################################\n\n')
         console.insert(tk.END, f'Image captured folder - {capturedFolder.get()}\n\n')
         console.see('insert')
-
-        fileNames = sorted(glob.glob(capturedFolder.get()+'\\*'),key=stringToList)
-        Format = '.'+fileNames[0].rsplit('.', 1)[1]
-        Images = len(fileNames)
 
         fig = plt.figure()
         ax = fig.gca()
@@ -874,7 +887,9 @@ def measure(menu, console, Valpixel, Valmm, Adjust, Alpha):
                      ptn[i][j] = points[i][j]/ratio
 
         else:
-            ptn[i][j] = points[i][j]
+            for i in [0,1]:
+                for j in [0, 1]:
+                    ptn[i][j] = points[i][j]
 
         # Find Valpixel value from interface:
         Valpixel.set(np.sqrt((ptn[0][0]-ptn[1][0])**2 + (ptn[0][1]-ptn[1][1])**2))
@@ -1091,6 +1106,20 @@ def Corr2D_V1(Image0, Image1, SubIr, SubIb, xL_mem, xL_shape, yL_mem, yL_shape, 
                     u0[Image1][i][j] = ui;
                     v0[Image1][i][j] = vi;
 
+                elif Type == 'Lagrangian V':
+
+                    x0[Image1][i][j] = x0[Image0][i][j]
+                    y0[Image1][i][j] = y0[Image0][i][j] + vi
+                    u0[Image1][i][j] = ui;
+                    v0[Image1][i][j] = vi;
+
+                elif Type == 'Lagrangian H':
+
+                    x0[Image1][i][j] = x0[Image0][i][j] + ui
+                    y0[Image1][i][j] = y0[Image0][i][j]
+                    u0[Image1][i][j] = ui;
+                    v0[Image1][i][j] = vi;
+
                 else:
 
                     x0[Image1][i][j] = x0[Image0][i][j]
@@ -1227,6 +1256,20 @@ def Corr2D_V2(Image0, Image1, SubIr, SubIb, OpiSub, xL_mem, xL_shape, yL_mem, yL
 
                     x0[Image1][i][j] = x0[Image0][i][j] + ui
                     y0[Image1][i][j] = y0[Image0][i][j] + vi
+                    u0[Image1][i][j] = ui;
+                    v0[Image1][i][j] = vi;
+
+                elif Type == 'Lagrangian V':
+
+                    x0[Image1][i][j] = x0[Image0][i][j]
+                    y0[Image1][i][j] = y0[Image0][i][j] + vi
+                    u0[Image1][i][j] = ui;
+                    v0[Image1][i][j] = vi;
+
+                elif Type == 'Lagrangian H':
+
+                    x0[Image1][i][j] = x0[Image0][i][j] + ui
+                    y0[Image1][i][j] = y0[Image0][i][j]
                     u0[Image1][i][j] = ui;
                     v0[Image1][i][j] = vi;
 

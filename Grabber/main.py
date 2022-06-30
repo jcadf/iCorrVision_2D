@@ -64,6 +64,7 @@ if __name__ == '__main__':
     # GUI style:
     s = ttk.Style()
     s.theme_use('alt')
+    s.configure(style='TCombobox', fieldbackground='#ccd9e1')
 
     # Global variables:
     global selectionFolder; selectionFolder = StringVar(menu)

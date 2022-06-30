@@ -53,6 +53,9 @@ import multiprocessing as mp
 ########################################################################################################################
 if __name__ == '__main__':
 
+    # Pyinstaller fix
+    mp.freeze_support()
+
     # Current directory:
     CurrentDir = os.path.dirname(os.path.realpath(__file__))
 
@@ -75,6 +78,8 @@ if __name__ == '__main__':
     # GUI style:
     s = ttk.Style()
     s.theme_use('alt')
+    s.configure(style='TCombobox', fieldbackground ='#ccd9e1')
+    s.configure(style='TSpinbox', fieldbackground ='#ccd9e1',arrowsize=13)
 
     # Global variables:
     global abort_param; abort_param = BooleanVar(menu); abort_param.set(False)
@@ -155,8 +160,8 @@ if __name__ == '__main__':
     Label(menu, text='Number of processors:', bg='#99b3c3', fg='#282C34', font=('Heveltica', 10)).place(x=xinit +
                                                                                                           dxinit + 181,
                                                                                                         y=yinit + dyinit * 2 - 23)
-    spinbox = ttk.Spinbox(menu, from_=2, to=mp.cpu_count(), increment=2, textvariable=Cores, font=('Heveltica', 10))
-    spinbox.place(x=xinit + dxinit + 181, y=yinit + dyinit * 2, width=135, height=25)
+    spinbox = ttk.Spinbox(menu, from_=2, to=mp.cpu_count(), increment=2, textvariable=Cores, font=('Heveltica', 10),style='TSpinbox')
+    spinbox.place(x=xinit + dxinit + 181, y=yinit + dyinit * 2, width=135, height=26)
     spinbox.set(mp.cpu_count())
 
     # Output folder name. Default name -> Results_Correlation
@@ -276,8 +281,9 @@ if __name__ == '__main__':
     Label(menu, text='Config.:', bg='#99b3c3', fg='#282C34', font=('Heveltica', 10)).place(
         x=xinit - 1 + dxinit * 0.5,
         y=yinit + dyinit * 5 - 23)
-    tipo_metodo = ttk.Combobox(menu, textvariable=Version, font=('Heveltica', 10))
-    tipo_metodo['values'] = ('Select', 'Eulerian', 'Lagrangian')
+    tipo_metodo = ttk.Combobox(menu, textvariable=Version, font=('Heveltica', 10), style = 'TCombobox')
+    tipo_metodo['values'] = ('Select', 'Eulerian', 'Lagrangian', 'Lagrangian H', 'Lagrangian V')
+    tipo_metodo.bind('<ButtonPress>', module.combo_configure)
     tipo_metodo.place(x=xinit + dxinit*0.5, y=yinit + dyinit * 5, width=66, height=25)
     tipo_metodo.current(0)
 
@@ -336,8 +342,9 @@ if __name__ == '__main__':
     # Type of cutting regions (Free, circular or rectangular):
     Label(menu, text='Type of cut:', bg='#99b3c3', fg='#282C34', font=('Heveltica', 10)).place(
         x=xinit - 1 + dxinit * 3, y=yinit + dyinit * 2 - 23)
-    tipo_corte = ttk.Combobox(menu, textvariable=TypeCut, font=('Heveltica', 10))
+    tipo_corte = ttk.Combobox(menu, textvariable=TypeCut, font=('Heveltica', 10), style = 'TCombobox')
     tipo_corte['values'] = ('None', 'Free', 'Rectangular', 'Circular inside', 'Circular outside')
+    tipo_corte.bind('<ButtonPress>', module.combo_configure)
     tipo_corte.place(x=xinit + dxinit * 3, y=yinit + dyinit * 2, width=77, height=25)
     tipo_corte.current(0)
 
